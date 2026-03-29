@@ -1,0 +1,16 @@
+{
+  "name": "event-registration-site",
+  "version": "1.0.0",
+  "description": "Event registration website with backend storage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "multer": "^1.4.5-lts.2",
+    "pdfkit": "^0.17.2",
+    "xlsx": "^0.18.5"
+  }
+}

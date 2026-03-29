@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-white p-4 sm:p-6">
+    <div class="max-w-7xl mx-auto space-y-5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <h1 class="text-2xl sm:text-3xl font-bold">Admin Portal</h1>
+        <div class="flex flex-wrap gap-2">
+          <button
+            id="toggleRegistrationBtn"
+            type="button"
+            class="rounded-lg bg-amber-300 text-slate-900 font-semibold px-4 py-2 hover:bg-amber-200 transition"
+          >
+            Loading…
+          </button>
+          <a
+            href="/api/admin/download/excel"
+            class="rounded-lg bg-emerald-300 text-slate-900 font-semibold px-4 py-2 hover:bg-emerald-200 transition"
+            >Download Excel</a
+          >
+          <a
+            href="/api/admin/download/pdf"
+            class="rounded-lg bg-cyan-300 text-slate-900 font-semibold px-4 py-2 hover:bg-cyan-200 transition"
+            >Download PDF</a
+          >
+          <button
+            id="logoutBtn"
+            class="rounded-lg bg-rose-300 text-slate-900 font-semibold px-4 py-2 hover:bg-rose-200 transition"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <div
+        class="rounded-xl border border-white/20 bg-white/5 p-4 flex flex-wrap items-end gap-4"
+      >
+        <div>
+          <label for="domainFilter" class="block text-sm font-medium mb-2"
+            >Filter by domain</label
+          >
+          <select
+            id="domainFilter"
+            class="rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white min-w-[220px] outline-none focus:ring-2 focus:ring-cyan-300"
+          >
+            <option value="">All domains</option>
+          </select>
+        </div>
+        <p id="filterCount" class="text-sm text-white/70 pb-2"></p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="rounded-xl border border-white/20 bg-white/5 p-4">
+          <h2 class="font-semibold mb-3">Team Size Count</h2>
+          <div class="text-sm space-y-1">
+            <p>3 Members: <span id="size3Count" class="font-bold">0</span></p>
+            <p>4 Members: <span id="size4Count" class="font-bold">0</span></p>
+            <p>Total Teams: <span id="totalTeamsCount" class="font-bold">0</span></p>
+          </div>
+        </div>
+        <div class="rounded-xl border border-white/20 bg-white/5 p-4">
+          <h2 class="font-semibold mb-3">Domain Selection Count</h2>
+          <div id="domainCounts" class="text-sm space-y-1"></div>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-white/20 bg-white/5 overflow-auto">
+        <table class="w-full text-sm min-w-[2800px]">
+          <thead class="bg-white/10">
+            <tr>
+              <th class="text-left px-3 py-2">SL No</th>
+              <th class="text-left px-3 py-2">Date</th>
+              <th class="text-left px-3 py-2">Team</th>
+              <th class="text-left px-3 py-2">College</th>
+              <th class="text-left px-3 py-2">Domain</th>
+              <th class="text-left px-3 py-2">Leader Phone</th>
+              <th class="text-left px-3 py-2">Email</th>
+              <th class="text-left px-3 py-2">Size</th>
+              <th class="text-left px-3 py-2">Transaction ID</th>
+              <th class="text-left px-3 py-2">Payment Proof</th>
+              <th class="text-left px-3 py-2">Member 1 Name</th>
+              <th class="text-left px-3 py-2">Member 1 USN</th>
+              <th class="text-left px-3 py-2">Member 1 Phone</th>
+              <th class="text-left px-3 py-2">Member 2 Name</th>
+              <th class="text-left px-3 py-2">Member 2 USN</th>
+              <th class="text-left px-3 py-2">Member 2 Phone</th>
+              <th class="text-left px-3 py-2">Member 3 Name</th>
+              <th class="text-left px-3 py-2">Member 3 USN</th>
+              <th class="text-left px-3 py-2">Member 3 Phone</th>
+              <th class="text-left px-3 py-2">Member 4 Name</th>
+              <th class="text-left px-3 py-2">Member 4 USN</th>
+              <th class="text-left px-3 py-2">Member 4 Phone</th>
+            </tr>
+          </thead>
+          <tbody id="rows" class="divide-y divide-white/10"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const rowsEl = document.getElementById("rows");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const toggleRegistrationBtn = document.getElementById(
+        "toggleRegistrationBtn",
+      );
+      const domainFilter = document.getElementById("domainFilter");
+      const filterCountEl = document.getElementById("filterCount");
+      const size3CountEl = document.getElementById("size3Count");
+      const size4CountEl = document.getElementById("size4Count");
+      const totalTeamsCountEl = document.getElementById("totalTeamsCount");
+      const domainCountsEl = document.getElementById("domainCounts");
+
+      let allRegistrations = [];
+
+      function memberField(members, index, key) {
+        const member = (members || [])[index];
+        if (!member) return "-";
+        return member[key] || "-";
+      }
+
+      function populateDomainFilter(domains) {
+        const current = domainFilter.value;
+        domainFilter.replaceChildren();
+        const allOpt = document.createElement("option");
+        allOpt.value = "";
+        allOpt.textContent = "All domains";
+        domainFilter.appendChild(allOpt);
+        domains.forEach((d) => {
+          const opt = document.createElement("option");
+          opt.value = d;
+          opt.textContent = d;
+          domainFilter.appendChild(opt);
+        });
+        if ([...domainFilter.options].some((o) => o.value === current)) {
+          domainFilter.value = current;
+        }
+      }
+
+      function getFilteredData() {
+        const domain = domainFilter.value;
+        if (!domain) return allRegistrations;
+        return allRegistrations.filter((row) => row.domain === domain);
+      }
+
+      function renderTable(data) {
+        rowsEl.innerHTML = "";
+        data.forEach((row, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-3 py-2 font-semibold">${index + 1}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${new Date(row.createdAt).toLocaleString()}</td>
+            <td class="px-3 py-2">${row.teamName}</td>
+            <td class="px-3 py-2">${row.teamCollege || ""}</td>
+            <td class="px-3 py-2">${row.domain}</td>
+            <td class="px-3 py-2">${row.teamPhone}</td>
+            <td class="px-3 py-2">${row.email}</td>
+            <td class="px-3 py-2">${row.teamSize}</td>
+            <td class="px-3 py-2">${row.transactionId}</td>
+            <td class="px-3 py-2">
+              <a href="${row.paymentScreenshot}" target="_blank" class="text-cyan-300 underline">View</a>
+            </td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 0, "name")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 0, "usn")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 0, "phone")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 1, "name")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 1, "usn")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 1, "phone")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 2, "name")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 2, "usn")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 2, "phone")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 3, "name")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 3, "usn")}</td>
+            <td class="px-3 py-2 whitespace-nowrap">${memberField(row.members, 3, "phone")}</td>
+          `;
+          rowsEl.appendChild(tr);
+        });
+      }
+
+      function renderSummary(data) {
+        let size3 = 0;
+        let size4 = 0;
+        const domainMap = {};
+
+        data.forEach((row) => {
+          if (Number(row.teamSize) === 3) size3 += 1;
+          if (Number(row.teamSize) === 4) size4 += 1;
+          const domain = row.domain || "Unknown";
+          domainMap[domain] = (domainMap[domain] || 0) + 1;
+        });
+
+        size3CountEl.textContent = String(size3);
+        size4CountEl.textContent = String(size4);
+        totalTeamsCountEl.textContent = String(data.length);
+
+        domainCountsEl.innerHTML = "";
+        Object.keys(domainMap)
+          .sort()
+          .forEach((domain) => {
+            const p = document.createElement("p");
+            p.innerHTML = `${domain}: <span class="font-bold">${domainMap[domain]}</span>`;
+            domainCountsEl.appendChild(p);
+          });
+
+        if (!Object.keys(domainMap).length) {
+          domainCountsEl.innerHTML = "<p>No entries yet.</p>";
+        }
+      }
+
+      async function loadRegistrations() {
+        const response = await fetch("/api/admin/registrations", {
+          credentials: "same-origin",
+        });
+        if (!response.ok) {
+          window.location.href = "/admin";
+          return;
+        }
+
+        const { data } = await response.json();
+        allRegistrations = data;
+        const distinctDomains = [
+          ...new Set(data.map((r) => r.domain).filter(Boolean)),
+        ].sort();
+        populateDomainFilter(distinctDomains);
+        applyFilter();
+      }
+
+      function applyFilter() {
+        const filtered = getFilteredData();
+        renderSummary(filtered);
+        renderTable(filtered);
+        if (domainFilter.value) {
+          filterCountEl.textContent = `Showing ${filtered.length} of ${allRegistrations.length} teams`;
+        } else {
+          filterCountEl.textContent = `${allRegistrations.length} team(s) total`;
+        }
+      }
+
+      domainFilter.addEventListener("change", applyFilter);
+
+      async function loadRegistrationToggle() {
+        const res = await fetch("/api/admin/settings", {
+          credentials: "same-origin",
+        });
+        if (!res.ok) return;
+        const { data } = await res.json();
+        updateToggleButton(data.registrationOpen);
+      }
+
+      function updateToggleButton(open) {
+        toggleRegistrationBtn.textContent = open
+          ? "Close registrations"
+          : "Open registrations";
+        toggleRegistrationBtn.classList.toggle("bg-amber-300", open);
+        toggleRegistrationBtn.classList.toggle("text-slate-900", open);
+        toggleRegistrationBtn.classList.toggle("bg-red-400", !open);
+        toggleRegistrationBtn.classList.toggle("text-white", !open);
+      }
+
+      toggleRegistrationBtn.addEventListener("click", async () => {
+        const res = await fetch("/api/admin/settings", {
+          credentials: "same-origin",
+        });
+        if (!res.ok) return;
+        const { data } = await res.json();
+        const nextOpen = !data.registrationOpen;
+
+        const body = { open: nextOpen };
+        if (!nextOpen) {
+          const msg = prompt(
+            "Registration ಮುಚ್ಚಿದಾಗ participants ಗೆ ಈ ಸಂದೇಶ ತೋರಿಸಲಾಗುತ್ತದೆ:",
+            data.closedMessage ||
+              "ಪ್ರಸ್ತುತ ರೆಜಿಸ್ಟ್ರೇಷನ್ ಮುಚ್ಚಲಾಗಿದೆ. ಮುಂದಿನ ಅಪ್‌ಡೇಟ್ ಗಾಗಿ ನೋಡಿ.",
+          );
+          if (msg === null) return;
+          body.closedMessage =
+            msg.trim() ||
+            data.closedMessage ||
+            "ಪ್ರಸ್ತುತ ರೆಜಿಸ್ಟ್ರೇಷನ್ ಮುಚ್ಚಲಾಗಿದೆ.";
+        }
+
+        await fetch("/api/admin/settings/registration", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify(body),
+        });
+        await loadRegistrationToggle();
+      });
+
+      logoutBtn.addEventListener("click", async () => {
+        await fetch("/api/admin/logout", {
+          method: "POST",
+          credentials: "same-origin",
+        });
+        window.location.href = "/admin";
+      });
+
+      loadRegistrationToggle();
+      loadRegistrations();
+    </script>
+  </body>
+</html>

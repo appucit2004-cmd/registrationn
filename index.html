@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registration Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            boxShadow: {
+              glass: "0 10px 30px rgba(15, 23, 42, 0.25)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #0f172a;
+        background-image:
+          radial-gradient(
+            circle at 20% 20%,
+            rgba(56, 189, 248, 0.22),
+            transparent 42%
+          ),
+          radial-gradient(
+            circle at 80% 10%,
+            rgba(129, 140, 248, 0.2),
+            transparent 40%
+          ),
+          radial-gradient(
+            circle at 50% 85%,
+            rgba(45, 212, 191, 0.16),
+            transparent 46%
+          );
+        background-attachment: fixed;
+      }
+
+      .glass-card {
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+      }
+
+      .fade-in-up {
+        animation: fadeInUp 0.8s ease forwards;
+      }
+
+      .hover-lift {
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          border-color 0.25s ease;
+      }
+
+      .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+
+      .floating-orb {
+        position: fixed;
+        border-radius: 9999px;
+        filter: blur(36px);
+        opacity: 0.35;
+        pointer-events: none;
+        z-index: 0;
+        animation: floatOrb 9s ease-in-out infinite;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(22px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes floatOrb {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+        }
+        50% {
+          transform: translateY(-24px) scale(1.06);
+        }
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-white antialiased">
+    <div class="floating-orb top-20 left-10 h-52 w-52 bg-cyan-300/40"></div>
+    <div
+      class="floating-orb bottom-16 right-10 h-64 w-64 bg-violet-300/40"
+      style="animation-delay: 1.5s"
+    ></div>
+    <div
+      class="floating-orb top-1/2 left-1/2 h-40 w-40 bg-emerald-300/30"
+      style="animation-delay: 2.8s"
+    ></div>
+    <main>
+      <section
+        class="min-h-screen flex items-center justify-center px-4 py-16 text-center relative z-10"
+      >
+        <div class="max-w-3xl fade-in-up">
+          <p
+            class="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1 text-sm font-medium ring-1 ring-white/30"
+          >
+            <span>BUILDATHON-2K25</span>
+          </p>
+          <h1
+            class="mt-6 text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight"
+          >
+            National Level Event Registration
+          </h1>
+          <p
+            class="mt-5 text-base sm:text-lg md:text-xl text-white/90 leading-relaxed"
+          >
+            Build your team, select your domain, and register for an exciting
+            competition in innovation, design, and technology.
+          </p>
+          <a
+            href="#registration"
+            class="mt-8 inline-flex items-center gap-2 rounded-xl bg-white text-indigo-700 font-semibold px-6 py-3 shadow-lg transition duration-300 hover:scale-105 hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-white/40"
+          >
+            Register Now
+            <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="registration" class="px-4 pb-20 relative z-10">
+        <div
+          class="mx-auto w-full max-w-4xl relative rounded-3xl glass-card p-5 sm:p-8 md:p-10 shadow-glass fade-in-up hover-lift"
+        >
+          <div class="mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold">
+              Event Registration Form
+            </h2>
+            <p class="text-white/80 mt-2">
+              Fill in all required details carefully.
+            </p>
+          </div>
+
+          <div class="mb-8">
+            <div
+              class="flex items-center justify-between text-sm text-white/90 mb-2"
+            >
+              <span>Form Completion</span>
+              <span id="progressText">0%</span>
+            </div>
+            <div class="h-2 rounded-full bg-white/25 overflow-hidden">
+              <div
+                id="progressBar"
+                class="h-full w-0 bg-white transition-all duration-500"
+              ></div>
+            </div>
+          </div>
+
+          <form id="regForm" class="space-y-6">
+            <div
+              id="registrationClosedBanner"
+              class="hidden rounded-xl border border-rose-400/40 bg-rose-500/15 px-4 py-3 text-sm text-rose-50"
+            >
+              <p class="font-semibold text-white mb-1">Registration closed</p>
+              <p id="registrationClosedMessage"></p>
+            </div>
+            <fieldset
+              id="regFormControls"
+              class="space-y-6 border-0 p-0 m-0 min-w-0 [&:disabled]:opacity-55 [&:disabled]:pointer-events-none"
+            >
+            <div>
+              <label for="email" class="block mb-2 text-sm font-semibold"
+                >Email Address <span class="text-red-200">*</span></label
+              >
+              <div class="relative">
+                <span
+                  class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/70"
+                  >✉️</span
+                >
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  class="hover-lift w-full rounded-xl border border-white/30 bg-white/10 py-3 pl-10 pr-3 text-white placeholder-white/60 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                  placeholder="Enter your email address"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="teamName" class="block mb-2 text-sm font-semibold"
+                  >Team Name <span class="text-red-200">*</span></label
+                >
+                <div class="relative">
+                  <span
+                    class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/70"
+                    >👥</span
+                  >
+                  <input
+                    id="teamName"
+                    name="teamName"
+                    type="text"
+                    required
+                    minlength="3"
+                    class="hover-lift w-full rounded-xl border border-white/30 bg-white/10 py-3 pl-10 pr-3 text-white placeholder-white/60 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                    placeholder="Enter team name"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label for="teamPhone" class="block mb-2 text-sm font-semibold"
+                  >Team Leader Whatsapp Number
+                  <span class="text-red-200">*</span></label
+                >
+                <div class="relative">
+                  <span
+                    class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-white/70"
+                    >📞</span
+                  >
+                  <input
+                    id="teamPhone"
+                    name="teamPhone"
+                    type="tel"
+                    required
+                    pattern="[6-9][0-9]{9}"
+                    class="hover-lift w-full rounded-xl border border-white/30 bg-white/10 py-3 pl-10 pr-3 text-white placeholder-white/60 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                    placeholder="10-digit mobile number"
+                  />
+                </div>
+                <!--<p class="mt-1 text-xs text-white/75">
+                  Must start with 6/7/8/9 and be 10 digits.
+                </p>-->
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label for="domain" class="block mb-2 text-sm font-semibold"
+                  >Select Domain <span class="text-red-200">*</span></label
+                >
+                <select
+                  id="domain"
+                  name="domain"
+                  required
+                  class="hover-lift w-full rounded-xl border border-white/30 bg-white/10 py-3 px-3 text-white outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                >
+                  <option value="" class="text-slate-800">Choose Domain</option>
+                  <option
+                    value="Artificial Intelligence"
+                    class="text-slate-800"
+                  >
+                    Artificial Intelligence
+                  </option>
+                  <option value="Web Development" class="text-slate-800">
+                    Web Development
+                  </option>
+                  <option value="Cyber Security" class="text-slate-800">
+                    Cyber Security
+                  </option>
+                  <option value="Data Science" class="text-slate-800">
+                    Data Science
+                  </option>
+                  <option value="UI/UX Design" class="text-slate-800">
+                    UI/UX Design
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label for="teamSize" class="block mb-2 text-sm font-semibold"
+                  >Team Size <span class="text-red-200">*</span></label
+                >
+                <select
+                  id="teamSize"
+                  name="teamSize"
+                  required
+                  class="hover-lift w-full rounded-xl border border-white/30 bg-white/10 py-3 px-3 text-white outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                >
+                  <option value="" class="text-slate-800">
+                    Choose Team Size
+                  </option>
+                  <option value="3" class="text-slate-800">3 Members</option>
+                  <option value="4" class="text-slate-800">4 Members</option>
+                </select>
+              </div>
+            </div>
+
+            <div
+              id="dynamicFields"
+              class="hidden rounded-2xl border border-white/25 bg-white/10 p-4 sm:p-6"
+            >
+              <h3 class="text-lg font-semibold mb-4">Team Members</h3>
+              <div id="membersContainer" class="space-y-4"></div>
+            </div>
+
+            <div
+              id="paymentSection"
+              class="hidden rounded-2xl border border-white/25 bg-white/10 p-4 sm:p-6 hover-lift"
+            >
+              <h3 class="text-lg font-semibold">Payment QR Code</h3>
+              <p class="text-sm text-white/80 mt-1">
+                Complete payment and keep screenshot for verification.
+              </p>
+              <div
+                class="mt-4 grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4 items-center"
+              >
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Devent%40upi%26pn%3DTech%2520Summit%25202026%26am%3D199%26cu%3DINR"
+                  alt="Payment QR Code"
+                  class="h-40 w-40 rounded-xl bg-white p-2 hover:scale-105 transition duration-300"
+                />
+                <div class="text-sm sm:text-base">
+                  <p class="font-semibold">Amount: INR 199 / Team</p>
+                  <p class="text-white/80 mt-1:font-semibold">
+                    UPI ID: <span class="font-medium">event@upi</span>
+                  </p>
+                  <!--<p class="text-white/80 mt-1">Reference: Team Name + Leader Phone</p>-->
+                </div>
+              </div>
+
+              <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="transactionId"
+                    class="block mb-2 text-sm font-medium"
+                    >Transaction ID <span class="text-red-200">*</span></label
+                  >
+                  <input
+                    id="transactionId"
+                    name="transactionId"
+                    type="text"
+                    minlength="6"
+                    class="hover-lift w-full rounded-xl border border-white/30 bg-white/10 py-3 px-3 text-white placeholder-white/60 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                    placeholder="Enter payment transaction ID"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="paymentScreenshot"
+                    class="block mb-2 text-sm font-medium"
+                    >Upload Payment Screenshot
+                    <span class="text-red-200">*</span></label
+                  >
+                  <input
+                    id="paymentScreenshot"
+                    name="paymentScreenshot"
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.webp"
+                    class="hover-lift w-full rounded-xl border border-white/30 bg-white/10 py-2.5 px-3 text-sm text-white file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-3 file:py-2 file:text-indigo-700 file:font-semibold hover:file:bg-white/90 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                  />
+                  <p class="mt-1 text-xs text-white/75">
+                    Accepted: PNG, JPG, JPEG, WEBP
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              id="nextBtn"
+              type="button"
+              class="w-full rounded-xl bg-cyan-200 text-slate-900 font-bold py-3.5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-cyan-100/60"
+            >
+              <span id="nextBtnText">Fill Participant Details</span>
+            </button>
+
+            <button
+              id="submitBtn"
+              type="submit"
+              class="hidden w-full rounded-xl bg-white text-indigo-700 font-bold py-3.5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-white/40 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              <span id="submitText">Submit Registration</span>
+            </button>
+            </fieldset>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <div
+      id="successPopup"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/70 px-4"
+    >
+      <div
+        class="w-full max-w-md rounded-2xl glass-card p-6 sm:p-8 text-center border border-white/30 fade-in-up"
+      >
+        <div
+          class="mx-auto mb-4 h-14 w-14 rounded-full bg-emerald-500/20 text-emerald-200 flex items-center justify-center text-2xl"
+        >
+          ✓
+        </div>
+        <h3 class="text-2xl font-bold">Registered Successfully</h3>
+        <p class="text-white/85 mt-2">
+          Your team details have been submitted successfully.
+        </p>
+        <button
+          id="closePopup"
+          class="mt-6 w-full rounded-xl bg-white text-indigo-700 font-semibold py-3 hover:shadow-lg transition"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const regForm = document.getElementById("regForm");
+      const regFormControls = document.getElementById("regFormControls");
+      const registrationClosedBanner = document.getElementById(
+        "registrationClosedBanner",
+      );
+      const registrationClosedMessage = document.getElementById(
+        "registrationClosedMessage",
+      );
+      const teamSize = document.getElementById("teamSize");
+      const dynamicFields = document.getElementById("dynamicFields");
+      const membersContainer = document.getElementById("membersContainer");
+      const successPopup = document.getElementById("successPopup");
+      const closePopup = document.getElementById("closePopup");
+      const submitBtn = document.getElementById("submitBtn");
+      const submitText = document.getElementById("submitText");
+      const nextBtn = document.getElementById("nextBtn");
+      const nextBtnText = document.getElementById("nextBtnText");
+      const progressBar = document.getElementById("progressBar");
+      const progressText = document.getElementById("progressText");
+      const paymentSection = document.getElementById("paymentSection");
+      const transactionId = document.getElementById("transactionId");
+      const paymentScreenshot = document.getElementById("paymentScreenshot");
+
+      let registrationIsOpen = true;
+
+      async function refreshRegistrationStatus() {
+        try {
+          const res = await fetch("/api/registration-status");
+          if (!res.ok) return;
+          const data = await res.json();
+          registrationIsOpen = Boolean(data.open);
+          if (registrationIsOpen) {
+            registrationClosedBanner.classList.add("hidden");
+            regFormControls.disabled = false;
+          } else {
+            registrationClosedBanner.classList.remove("hidden");
+            registrationClosedMessage.textContent =
+              data.message || "Registration is currently closed.";
+            regFormControls.disabled = true;
+          }
+        } catch {
+          registrationIsOpen = true;
+          registrationClosedBanner.classList.add("hidden");
+          regFormControls.disabled = false;
+        }
+        updateProgress();
+      }
+
+      function createMemberFields(totalMembers) {
+        membersContainer.innerHTML = "";
+
+        for (let i = 1; i <= totalMembers; i++) {
+          const memberTitle = i === 1 ? "Team Leader" : `Member ${i}`;
+          const block = document.createElement("div");
+          block.className =
+            "grid grid-cols-1 md:grid-cols-3 gap-4 rounded-xl border border-white/20 bg-white/5 p-4 hover-lift";
+          block.innerHTML = `
+                    <div>
+                        <label class="block mb-2 text-sm font-medium">${memberTitle} Name <span class="text-red-200">*</span></label>
+                        <input type="text" name="member${i}Name" required minlength="2"
+                            class="member-field w-full rounded-xl border border-white/30 bg-white/10 py-3 px-3 text-white placeholder-white/60 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                            placeholder="Enter ${memberTitle.toLowerCase()} name">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium">${memberTitle} USN <span class="text-red-200">*</span></label>
+                        <input type="text" name="member${i}Usn" required pattern="[A-Za-z0-9]{8,15}"
+                            class="member-field w-full rounded-xl border border-white/30 bg-white/10 py-3 px-3 uppercase text-white placeholder-white/60 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                            placeholder="Enter ${memberTitle.toLowerCase()} USN">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium">${memberTitle} Phone <span class="text-red-200">*</span></label>
+                        <input type="tel" name="member${i}Phone" required pattern="[6-9][0-9]{9}"
+                            class="member-field w-full rounded-xl border border-white/30 bg-white/10 py-3 px-3 text-white placeholder-white/60 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+                            placeholder="Enter ${memberTitle.toLowerCase()} phone">
+                    </div>
+                `;
+          membersContainer.appendChild(block);
+        }
+
+        const teamCollegeBlock = document.createElement("div");
+        teamCollegeBlock.className =
+          "rounded-xl border border-white/20 bg-white/5 p-4 hover-lift";
+        teamCollegeBlock.innerHTML = `
+          <label class="block mb-2 text-sm font-medium">Team College <span class="text-red-200">*</span></label>
+          <input
+            type="text"
+            name="teamCollege"
+            required
+            minlength="2"
+            class="member-field w-full rounded-xl border border-white/30 bg-white/10 py-3 px-3 text-white placeholder-white/60 outline-none transition focus:border-white focus:ring-2 focus:ring-white/30"
+            placeholder="Enter team college name"
+          >
+        `;
+        membersContainer.insertBefore(
+          teamCollegeBlock,
+          membersContainer.firstChild,
+        );
+
+        dynamicFields.classList.remove("hidden");
+        updateProgress();
+      }
+
+      function clearMemberFields() {
+        membersContainer.innerHTML = "";
+        dynamicFields.classList.add("hidden");
+        togglePaymentSection(false);
+        updateProgress();
+      }
+
+      function participantDetailsComplete() {
+        const size = Number(teamSize.value);
+        if (!(size === 3 || size === 4)) return false;
+
+        const participantFields = regForm.querySelectorAll(".member-field");
+        if (participantFields.length !== size * 3 + 1) return false;
+
+        return Array.from(participantFields).every(
+          (field) => field.checkValidity() && field.value.trim() !== "",
+        );
+      }
+
+      function paymentDetailsComplete() {
+        return (
+          !paymentSection.classList.contains("hidden") &&
+          transactionId.checkValidity() &&
+          transactionId.value.trim() !== "" &&
+          paymentScreenshot.files &&
+          paymentScreenshot.files.length > 0
+        );
+      }
+
+      function basicDetailsComplete() {
+        const basicFields = [
+          document.getElementById("email"),
+          document.getElementById("teamName"),
+          document.getElementById("teamPhone"),
+          document.getElementById("domain"),
+          document.getElementById("teamSize"),
+        ];
+
+        return basicFields.every(
+          (field) => field.checkValidity() && field.value.trim() !== "",
+        );
+      }
+
+      function togglePaymentSection(show) {
+        if (show) {
+          paymentSection.classList.remove("hidden");
+          transactionId.required = true;
+          paymentScreenshot.required = true;
+        } else {
+          paymentSection.classList.add("hidden");
+          transactionId.required = false;
+          paymentScreenshot.required = false;
+          transactionId.value = "";
+          paymentScreenshot.value = "";
+        }
+      }
+
+      function getTrackableFields() {
+        return regForm.querySelectorAll("input[required], select[required]");
+      }
+
+      function updateProgress() {
+        const fields = getTrackableFields();
+        if (!fields.length) return;
+
+        let filled = 0;
+        fields.forEach((field) => {
+          if (field.type === "file") {
+            if (field.files && field.files.length > 0) {
+              filled += 1;
+            }
+          } else if (field.value.trim() !== "") {
+            filled += 1;
+          }
+        });
+
+        const percent = Math.round((filled / fields.length) * 100);
+        progressBar.style.width = `${percent}%`;
+        progressText.textContent = `${percent}%`;
+
+        togglePaymentSection(participantDetailsComplete());
+        updateActionButtons();
+      }
+
+      function updateActionButtons() {
+        if (!registrationIsOpen) {
+          submitBtn.classList.add("hidden");
+          nextBtn.classList.remove("hidden");
+          nextBtn.disabled = true;
+          nextBtnText.textContent = "Registration closed";
+          return;
+        }
+
+        nextBtn.disabled = false;
+
+        const participantsDone = participantDetailsComplete();
+        const paymentDone = paymentDetailsComplete();
+        const canSubmit = participantsDone && paymentDone;
+
+        if (canSubmit) {
+          submitBtn.classList.remove("hidden");
+          nextBtn.classList.add("hidden");
+          return;
+        }
+
+        submitBtn.classList.add("hidden");
+        nextBtn.classList.remove("hidden");
+
+        if (!basicDetailsComplete()) {
+          nextBtnText.textContent = "Fill Basic Details";
+        } else if (!participantsDone) {
+          nextBtnText.textContent = "Fill Participant Details";
+        } else {
+          nextBtnText.textContent = "Complete Payment Details";
+        }
+      }
+
+      teamSize.addEventListener("change", (e) => {
+        const selected = Number(e.target.value);
+        if (selected === 3 || selected === 4) {
+          createMemberFields(selected);
+        } else {
+          clearMemberFields();
+        }
+      });
+
+      regForm.addEventListener("input", updateProgress);
+      regForm.addEventListener("change", updateProgress);
+
+      nextBtn.addEventListener("click", () => {
+        if (!registrationIsOpen) {
+          return;
+        }
+
+        if (!basicDetailsComplete()) {
+          regForm.reportValidity();
+          return;
+        }
+
+        const size = Number(teamSize.value);
+        if (
+          (size === 3 || size === 4) &&
+          membersContainer.children.length === 0
+        ) {
+          createMemberFields(size);
+        }
+
+        if (!participantDetailsComplete()) {
+          dynamicFields.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+
+        if (paymentSection.classList.contains("hidden")) {
+          togglePaymentSection(true);
+        }
+
+        paymentSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      regForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!registrationIsOpen) {
+          alert(registrationClosedMessage.textContent);
+          return;
+        }
+
+        if (!regForm.checkValidity()) {
+          regForm.reportValidity();
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitText.innerHTML = `<span class="inline-flex items-center gap-2"><svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.3" stroke-width="4"></circle><path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="4"></path></svg>Submitting...</span>`;
+
+        try {
+          const formData = new FormData(regForm);
+          const response = await fetch("/api/register", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (response.status === 403) {
+            const body = await response.json().catch(() => ({}));
+            await refreshRegistrationStatus();
+            throw new Error(
+              body.message || "Registration is closed. You cannot submit.",
+            );
+          }
+
+          if (!response.ok) {
+            throw new Error("Submission failed");
+          }
+
+          submitBtn.disabled = false;
+          submitText.textContent = "Submit Registration";
+          successPopup.classList.remove("hidden");
+          successPopup.classList.add("flex");
+
+          regForm.reset();
+          clearMemberFields();
+          updateProgress();
+        } catch (error) {
+          submitBtn.disabled = false;
+          submitText.textContent = "Submit Registration";
+          alert(
+            error && error.message
+              ? error.message
+              : "Unable to submit right now. Please try again.",
+          );
+        }
+      });
+
+      closePopup.addEventListener("click", () => {
+        successPopup.classList.add("hidden");
+        successPopup.classList.remove("flex");
+      });
+
+      successPopup.addEventListener("click", (e) => {
+        if (e.target === successPopup) {
+          successPopup.classList.add("hidden");
+          successPopup.classList.remove("flex");
+        }
+      });
+
+      refreshRegistrationStatus();
+    </script>
+  </body>
+</html>

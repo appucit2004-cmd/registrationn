@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-900 text-white flex items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-2xl border border-white/20 bg-white/10 p-6">
+      <h1 class="text-2xl font-bold mb-2">Admin Login</h1>
+      <p class="text-sm text-white/70 mb-6">Authorized access only.</p>
+
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-sm mb-2">Username</label>
+          <input
+            id="username"
+            type="text"
+            required
+            class="w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2.5 outline-none focus:ring-2 focus:ring-cyan-300"
+          />
+        </div>
+        <div>
+          <label class="block text-sm mb-2">Password</label>
+          <input
+            id="password"
+            type="password"
+            required
+            class="w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2.5 outline-none focus:ring-2 focus:ring-cyan-300"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full rounded-lg bg-cyan-300 text-slate-900 font-bold py-2.5 hover:bg-cyan-200 transition"
+        >
+          Login
+        </button>
+      </form>
+
+      <p id="errorMsg" class="text-red-300 text-sm mt-4 hidden">Invalid credentials.</p>
+    </div>
+
+    <script>
+      const form = document.getElementById("loginForm");
+      const errorMsg = document.getElementById("errorMsg");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorMsg.classList.add("hidden");
+
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+
+        if (response.ok) {
+          window.location.href = "/admin.html";
+          return;
+        }
+
+        errorMsg.classList.remove("hidden");
+      });
+    </script>
+  </body>
+</html>
